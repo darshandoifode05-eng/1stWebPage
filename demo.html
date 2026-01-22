@@ -1,0 +1,973 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Clone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --text-primary: #000000;
+            --text-secondary: #737373;
+            --border-color: #dbdbdb;
+            --button-blue: #0095f6;
+            --button-text: #ffffff;
+            --story-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            --nav-width: 245px;
+            --nav-collapsed-width: 72px;
+        }
+
+        body.dark-mode {
+            --bg-primary: #000000;
+            --bg-secondary: #121212;
+            --text-primary: #f5f5f5;
+            --text-secondary: #a8a8a8;
+            --border-color: #363636;
+            --button-blue: #0095f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            text-decoration: none;
+            list-style: none;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            width: var(--nav-width);
+            height: 100vh;
+            border-right: 1px solid var(--border-color);
+            padding: 24px 12px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            background-color: var(--bg-primary);
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Billabong', cursive; /* Fallback needed if font not loaded, using generic style here */
+            font-size: 2rem;
+            margin-bottom: 30px;
+            padding-left: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        /* Simulating Instagram Logo Text */
+        .logo-text {
+            font-style: italic;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 4px 0;
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition:  0.2s;
+        }
+
+        .nav-link:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .nav-link i {
+            font-size: 24px;
+            width: 30px;
+            margin-right: 16px;
+        }
+
+        .nav-link span {
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .nav-link.active i {
+            font-weight: 900; 
+        }
+
+        .nav-link.active span {
+            font-weight: bold;
+        }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex: 1;
+            margin-left: var(--nav-width);
+            display: flex;
+            justify-content: center;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        /* --- Pages --- */
+        .page {
+            display: none;
+            width: 100%;
+            max-width: 630px;
+            padding-top: 30px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* --- Home: Stories --- */
+        .stories-container {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 0;
+            margin-bottom: 24px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .stories-container::-webkit-scrollbar { display: none; }
+
+        .story {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            min-width: 66px;
+        }
+
+        .story-ring {
+            width: 66px;
+            height: 66px;
+            border-radius: 50%;
+            padding: 2px;
+            background: var(--story-gradient);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .story-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-primary);
+            object-fit: cover;
+        }
+
+        .story-name {
+            font-size: 12px;
+            margin-top: 5px;
+            color: var(--text-primary);
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* --- Home: Feed --- */
+        .post {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+
+        .post-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .post-user img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .post-image-container {
+            width: 100%;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .post-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+        }
+
+        .action-left {
+            display: flex;
+            gap: 16px;
+        }
+
+        .post-actions i {
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        
+        .post-actions i:active {
+            transform: scale(0.9);
+        }
+
+        .post-actions i.fa-heart.liked {
+            color: #ed4956;
+            font-weight: 900;
+        }
+
+        .likes-count {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .caption {
+            font-size: 14px;
+        }
+
+        .caption span {
+            font-weight: 600;
+        }
+
+        .comments-link {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 6px;
+            cursor: pointer;
+        }
+
+        .time-ago {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        /* --- Right Sidebar (Suggestions) --- */
+        .right-sidebar {
+            width: 320px;
+            padding: 30px 0 0 30px;
+            display: none; /* Hidden on small screens */
+        }
+
+        @media (min-width: 1000px) {
+            .right-sidebar { display: block; }
+        }
+
+        .user-profile-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .switch-btn {
+            color: var(--button-blue);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .suggestions-header {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        /* --- Messages Page --- */
+        #messages-page {
+            max-width: 900px;
+            height: 95vh;
+            display: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        
+        #messages-page.active {
+            display: flex;
+        }
+
+        .messages-sidebar {
+            width: 35%;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .message-list {
+            overflow-y: auto;
+        }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .message-item:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-primary);
+        }
+
+        /* --- Reels Page --- */
+        #reels-page {
+            width: 100%;
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            padding: 0;
+            max-width: 400px; /* Mobile reel width */
+        }
+
+        .reel-container {
+            height: 95vh;
+            width: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            background-color: #111;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .reel-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+        }
+
+        .reel-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 10px;
+            color: white;
+            z-index: 10;
+        }
+
+        .reel-actions {
+            position: absolute;
+            bottom: 20px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            color: white;
+            align-items: center;
+        }
+
+        /* --- Profile Page --- */
+        .profile-header {
+            display: flex;
+            gap: 40px;
+            padding: 20px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-pic-lg {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px; /* Standard Insta gap */
+        }
+
+        .grid-item {
+            aspect-ratio: 1/1;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .grid-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.3);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            gap: 15px;
+            font-weight: bold;
+        }
+        
+        .grid-item:hover .grid-overlay {
+            display: flex;
+        }
+
+        /* --- Utility & Mobile --- */
+        .btn {
+            background-color: var(--button-blue);
+            color: white;
+            border: none;
+            padding: 5px 16px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* Theme Toggle Styling */
+        .theme-toggle {
+            margin-top: auto; /* Push to bottom of sidebar */
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: 50px;
+                bottom: 0;
+                top: auto;
+                flex-direction: row;
+                justify-content: space-around;
+                padding: 0;
+                border-top: 1px solid var(--border-color);
+                border-right: none;
+            }
+            
+            .nav-link span, .logo, .theme-toggle {
+                display: none;
+            }
+            
+            .nav-link {
+                margin: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                margin-bottom: 50px; /* Space for bottom nav */
+            }
+
+            .right-sidebar {
+                display: none;
+            }
+            
+            #messages-page {
+                height: calc(100vh - 50px);
+                margin-top: 0;
+                border: none;
+            }
+            
+            .messages-sidebar {
+                width: 100%; /* Show only list on mobile initially */
+            }
+            
+            .chat-area {
+                display: none; /* Hide chat area on mobile for simple list view */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo">
+            <span class="logo-text">Instagram</span>
+        </div>
+        
+        <div class="nav-link active" onclick="showPage('home')">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </div>
+        <div class="nav-link" onclick="showPage('search')">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Search</span>
+        </div>
+        <div class="nav-link" onclick="showPage('explore')">
+            <i class="fa-regular fa-compass"></i>
+            <span>Explore</span>
+        </div>
+        <div class="nav-link" onclick="showPage('reels')">
+            <i class="fa-solid fa-clapperboard"></i>
+            <span>Reels</span>
+        </div>
+        <div class="nav-link" onclick="showPage('messages')">
+            <i class="fa-regular fa-paper-plane"></i>
+            <span>Messages</span>
+        </div>
+        <div class="nav-link">
+            <i class="fa-regular fa-heart"></i>
+            <span>Notifications</span>
+        </div>
+        <div class="nav-link">
+            <i class="fa-regular fa-square-plus"></i>
+            <span>Create</span>
+        </div>
+        <div class="nav-link" onclick="showPage('profile')">
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+        </div>
+
+        <div class="nav-link theme-toggle" onclick="toggleTheme()">
+            <i class="fa-solid fa-moon"></i>
+            <span>Switch Appearance</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        
+        <div id="home-page" class="page active">
+            <div class="stories-container" id="stories-wrapper">
+                </div>
+
+            <div id="feed-container">
+                </div>
+        </div>
+
+        <div id="reels-page" class="page">
+            <div class="reel-container">
+                <img src="https://picsum.photos/400/800?random=10" class="reel-video">
+                <div class="reel-overlay">
+                    <h3>@creative_guy</h3>
+                    <p>Trying out this new effect! 🔥 #fyp #trending</p>
+                </div>
+                <div class="reel-actions">
+                    <div><i class="fa-regular fa-heart"></i><br><span style="font-size:12px">23k</span></div>
+                    <div><i class="fa-regular fa-comment"></i><br><span style="font-size:12px">450</span></div>
+                    <div><i class="fa-regular fa-paper-plane"></i></div>
+                </div>
+            </div>
+            <div class="reel-container">
+                <img src="https://picsum.photos/400/800?random=11" class="reel-video">
+                <div class="reel-overlay">
+                    <h3>@travel_diary</h3>
+                    <p>Sunset in Bali 🌅 #travel #bali</p>
+                </div>
+                <div class="reel-actions">
+                    <div><i class="fa-regular fa-heart"></i><br><span style="font-size:12px">100k</span></div>
+                    <div><i class="fa-regular fa-comment"></i></div>
+                    <div><i class="fa-regular fa-paper-plane"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="messages-page" class="page">
+            <div class="messages-sidebar">
+                <div class="messages-header">
+                    johndoe_official <i class="fa-solid fa-chevron-down" style="margin-left: 5px;"></i>
+                </div>
+                <div class="message-list" id="message-list-container">
+                    </div>
+            </div>
+            <div class="chat-area">
+                <div style="text-align: center;">
+                    <i class="fa-regular fa-paper-plane" style="font-size: 50px; margin-bottom: 20px;"></i>
+                    <h2>Your Messages</h2>
+                    <p style="color: var(--text-secondary);">Send private photos and messages to a friend or group.</p>
+                    <button class="btn" style="margin-top: 20px;">Send Message</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="profile-page" class="page">
+            <div class="profile-header">
+                <img src="https://picsum.photos/150/150?random=99" class="profile-pic-lg">
+                <div class="profile-info">
+                    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
+                        <h2 style="font-weight: 300;">johndoe_official</h2>
+                        <button class="btn btn-outline">Edit Profile</button>
+                        <i class="fa-solid fa-gear"></i>
+                    </div>
+                    <div class="profile-stats">
+                        <span><strong>15</strong> posts</span>
+                        <span><strong>1.2k</strong> followers</span>
+                        <span><strong>450</strong> following</span>
+                    </div>
+                    <div>
+                        <strong>John Doe</strong><br>
+                        Digital Creator 📸<br>
+                        Exploring the world one click at a time.<br>
+                        www.johndoe.com
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-tabs" style="display: flex; justify-content: center; gap: 50px; border-top: 1px solid var(--border-color); padding: 15px 0; color: var(--text-secondary); font-size: 12px; letter-spacing: 1px;">
+                <span style="color: var(--text-primary); border-top: 1px solid var(--text-primary); margin-top: -16px; padding-top: 15px; display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-table-cells"></i> POSTS</span>
+                <span style="display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-clapperboard"></i> REELS</span>
+                <span style="display: flex; align-items: center; gap: 5px;"><i class="fa-regular fa-bookmark"></i> SAVED</span>
+            </div>
+
+            <div class="profile-grid" id="profile-grid">
+                </div>
+        </div>
+
+        <div id="search-page" class="page">
+             <div style="padding: 10px 0;">
+                 <input type="text" placeholder="Search" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+             </div>
+             <div class="profile-grid" id="explore-grid" style="margin-top: 20px;">
+                 </div>
+        </div>
+
+    </div> <div class="right-sidebar">
+        <div class="user-profile-switch">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="https://picsum.photos/50/50?random=99" style="width: 50px; height: 50px; border-radius: 50%;">
+                <div style="font-size: 14px;">
+                    <div style="font-weight: bold;">johndoe_official</div>
+                    <div style="color: var(--text-secondary);">John Doe</div>
+                </div>
+            </div>
+            <div class="switch-btn">Switch</div>
+        </div>
+
+        <div class="suggestions-header">
+            <span>Suggestions For You</span>
+            <span style="color: var(--text-primary); font-size: 12px; cursor: pointer;">See All</span>
+        </div>
+
+        <div id="suggestions-list">
+            </div>
+
+        <div style="margin-top: 30px; color: #dbdbdb; font-size: 12px;">
+            <p>© 2023 INSTAGRAM CLONE FOR EDUCATIONAL PURPOSES</p>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const users = [
+            { name: 'jane_smith', img: 'https://picsum.photos/60/60?random=1' },
+            { name: 'travel_mike', img: 'https://picsum.photos/60/60?random=2' },
+            { name: 'foodie_lisa', img: 'https://picsum.photos/60/60?random=3' },
+            { name: 'fitness_jim', img: 'https://picsum.photos/60/60?random=4' },
+            { name: 'art_corner', img: 'https://picsum.photos/60/60?random=5' },
+            { name: 'tech_guru', img: 'https://picsum.photos/60/60?random=6' },
+            { name: 'nature_lovers', img: 'https://picsum.photos/60/60?random=7' },
+        ];
+
+        const posts = [
+            {
+                id: 1,
+                user: 'jane_smith',
+                userImg: 'https://picsum.photos/32/32?random=1',
+                postImg: 'https://picsum.photos/600/600?random=101',
+                likes: 124,
+                caption: 'Beautiful morning! ☀️ #sunrise #vibes',
+                comments: 12,
+                time: '2 HOURS AGO'
+            },
+            {
+                id: 2,
+                user: 'tech_guru',
+                userImg: 'https://picsum.photos/32/32?random=6',
+                postImg: 'https://picsum.photos/600/500?random=102',
+                likes: 856,
+                caption: 'The new setup is finally complete. Thoughts? 💻 #setup #tech',
+                comments: 45,
+                time: '5 HOURS AGO'
+            },
+            {
+                id: 3,
+                user: 'foodie_lisa',
+                userImg: 'https://picsum.photos/32/32?random=3',
+                postImg: 'https://picsum.photos/600/700?random=103',
+                likes: 2300,
+                caption: 'Best burger in town! 🍔 #foodporn',
+                comments: 120,
+                time: '1 DAY AGO'
+            }
+        ];
+
+        // --- RENDER FUNCTIONS ---
+
+        function renderStories() {
+            const container = document.getElementById('stories-wrapper');
+            let html = '';
+            users.forEach(user => {
+                html += `
+                    <div class="story">
+                        <div class="story-ring">
+                            <img src="${user.img}" class="story-img">
+                        </div>
+                        <span class="story-name">${user.name}</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderFeed() {
+            const container = document.getElementById('feed-container');
+            let html = '';
+            posts.forEach(post => {
+                html += `
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-user">
+                                <img src="${post.userImg}">
+                                <span>${post.user}</span>
+                                <span style="color: var(--text-secondary); margin: 0 5px;">•</span>
+                                <span style="color: var(--button-blue); font-size: 12px; cursor: pointer;" onclick="toggleFollow(this)">Follow</span>
+                            </div>
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </div>
+                        <div class="post-image-container" ondblclick="likePost(this)">
+                            <img src="${post.postImg}" class="post-image">
+                        </div>
+                        <div class="post-actions">
+                            <div class="action-left">
+                                <i class="fa-regular fa-heart" onclick="toggleLike(this)"></i>
+                                <i class="fa-regular fa-comment"></i>
+                                <i class="fa-regular fa-paper-plane"></i>
+                            </div>
+                            <i class="fa-regular fa-bookmark" onclick="toggleBookmark(this)"></i>
+                        </div>
+                        <div class="likes-count">${post.likes} likes</div>
+                        <div class="caption">
+                            <span>${post.user}</span> ${post.caption}
+                        </div>
+                        <div class="comments-link">View all ${post.comments} comments</div>
+                        <div class="time-ago">${post.time}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderSuggestions() {
+            const container = document.getElementById('suggestions-list');
+            let html = '';
+            // Pick last 3 users for suggestions
+            users.slice(-4).forEach(user => {
+                html += `
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <img src="${user.img}" style="width: 32px; height: 32px; border-radius: 50%;">
+                            <div style="font-size: 12px;">
+                                <div style="font-weight: 600;">${user.name}</div>
+                                <div style="color: var(--text-secondary);">New to Instagram</div>
+                            </div>
+                        </div>
+                        <div class="switch-btn" onclick="toggleFollow(this)">Follow</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('message-list-container');
+            let html = '';
+            users.forEach(user => {
+                html += `
+                    <div class="message-item">
+                        <img src="${user.img}" style="width: 50px; height: 50px; border-radius: 50%;">
+                        <div>
+                            <div style="font-weight: 600;">${user.name}</div>
+                            <div style="color: var(--text-secondary); font-size: 14px;">Active now</div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderProfileGrid() {
+            const container = document.getElementById('profile-grid');
+            const exploreContainer = document.getElementById('explore-grid');
+            let html = '';
+            for(let i=0; i<15; i++) {
+                html += `
+                    <div class="grid-item">
+                        <img src="https://picsum.photos/300/300?random=${200+i}">
+                        <div class="grid-overlay">
+                            <span><i class="fa-solid fa-heart"></i> ${Math.floor(Math.random()*500)}</span>
+                            <span><i class="fa-solid fa-comment"></i> ${Math.floor(Math.random()*50)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+            exploreContainer.innerHTML = html; // Reusing for explore
+        }
+
+        // --- INTERACTION FUNCTIONS ---
+
+        function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageName === 'explore' ? 'search-page' : pageName + '-page').classList.add('active');
+            
+            // Update sidebar active state
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            // Find the clicked link and make it active (simplified logic)
+            event.currentTarget.classList.add('active');
+            
+            // Mobile Specifics: Hide Header/Sidebar logic could go here
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.querySelector('.theme-toggle i');
+            if(document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+
+        function toggleLike(element) {
+            if(element.classList.contains('fa-regular')) {
+                element.classList.remove('fa-regular');
+                element.classList.add('fa-solid');
+                element.classList.add('liked');
+            } else {
+                element.classList.remove('fa-solid');
+                element.classList.remove('liked');
+                element.classList.add('fa-regular');
+            }
+        }
+
+        function likePost(container) {
+            // Find the heart icon in this post
+            const post = container.parentElement;
+            const heart = post.querySelector('.action-left .fa-heart');
+            
+            // Add animation visual (omitted for brevity, just toggling state)
+            if(heart.classList.contains('fa-regular')) {
+                toggleLike(heart);
+            }
+            
+            // Optional: Create a temporary floating heart animation in center of image
+            const floatHeart = document.createElement('i');
+            floatHeart.className = 'fa-solid fa-heart';
+            floatHeart.style.position = 'absolute';
+            floatHeart.style.top = '50%';
+            floatHeart.style.left = '50%';
+            floatHeart.style.transform = 'translate(-50%, -50%) scale(0)';
+            floatHeart.style.color = 'white';
+            floatHeart.style.fontSize = '80px';
+            floatHeart.style.transition = 'all 0.3s ease';
+            floatHeart.style.textShadow = '0 0 10px rgba(0,0,0,0.5)';
+            
+            container.style.position = 'relative';
+            container.appendChild(floatHeart);
+            
+            setTimeout(() => floatHeart.style.transform = 'translate(-50%, -50%) scale(1.2)', 50);
+            setTimeout(() => floatHeart.style.transform = 'translate(-50%, -50%) scale(0)', 800);
+            setTimeout(() => floatHeart.remove(), 1000);
+        }
+
+        function toggleBookmark(element) {
+            if(element.classList.contains('fa-regular')) {
+                element.classList.remove('fa-regular');
+                element.classList.add('fa-solid');
+            } else {
+                element.classList.remove('fa-solid');
+                element.classList.add('fa-regular');
+            }
+        }
+
+        function toggleFollow(btn) {
+            if(btn.innerText === 'Follow') {
+                btn.innerText = 'Following';
+                btn.style.color = 'var(--text-primary)';
+            } else {
+                btn.innerText = 'Follow';
+                btn.style.color = 'var(--button-blue)';
+            }
+        }
+
+        // --- INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            renderStories();
+            renderFeed();
+            renderSuggestions();
+            renderMessages();
+            renderProfileGrid();
+        });
+
+    </script>
+</body>
+</html>
