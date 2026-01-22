@@ -1,14 +1,12 @@
-<!DOCTYPE html><!DOCTYPE html><!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DarshanDoifode.site</title>
+    <title>DarshanDoifode</title>
     <style>
-        .b {
-            
-        }
+        .b {}
 
         .head {
             background-color: rgb(240, 28, 28);
@@ -17,11 +15,13 @@
             text-align: center;
             width: 700px;
             font-size: 59px;
-            margin-left: 650px;margin-top: 150px;
+            margin-left: 650px;
+            margin-top: 150px;
             border-radius: 100px;
         }
 
-        .para1 {opacity: 79%;
+        .para1 {
+            opacity: 79%;
             background-color: rgb(225, 190, 93);
             color: rgb(14, 12, 9);
             padding: 20px 20px;
@@ -57,7 +57,8 @@
             margin-left: 110px;
             color: rgb(220, 225, 230);
             position: relative;
-            border-radius: 25px;opacity: 79%;
+            border-radius: 25px;
+            opacity: 79%;
         }
 
         .teslogo {
@@ -68,7 +69,8 @@
             margin-left: 110px;
         }
 
-        .para3 {opacity: 79%;
+        .para3 {
+            opacity: 79%;
             padding: 60px 90px;
             margin-left: 110px;
             font-size: 30px;
@@ -79,35 +81,54 @@
             position: relative;
             color: rgb(44, 42, 40);
             border-radius: 15px;
-        }/* Space background canvas */
-#space {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1;
-}
+        }
 
-/* Optional: ensure content is visible */
-body {
-    background: black;
-    color: white;
-}
+        /* Space background canvas */
+        #space {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
 
+        /* Optional: ensure content is visible */
+        body {
+            position: relative;
+            background: black;
+            color: white;
+        }
+
+
+        .btn {
+            border-radius: 15px;
+            padding: 5px;
+            font-size: 15px;
+            color: black;
+            opacity: 75%;
+            background-color: rgb(150, 211, 35);
+            position: absolute;
+            bottom: -100px;
+            left: 50%;
+        }
     </style>
 </head>
 
-<body class="b"><canvas id="space"></canvas>
+<body class="b"> <a class="btn" onclick="goPage()">Next page
+    </a>
+    <canvas id="space"></canvas>
+
     <div class="head overlap">Elon Musk bio.</div>
     <p class="para1 overlap">Elon Musk (born June 28, 1971) is a businessman and entrepreneur who is the wealthiest
         person in
         the world,
         with a net worth estimated at $718 billion as of early 2026. He is the CEO of Tesla and SpaceX, and the
         owner of the social media platform X (formerly Twitter). </p>
- <a href="https://x.com/elonmusk">
-    <img src="elon.jpg" class="elonFloat" id="elonFloat" alt="Elon Musk">
-   </a>
+    <a href="https://x.com/elonmusk">
+        <img src="elon.jpg" class="elonFloat" id="elonFloat" alt="Elon Musk">
+    </a>
+
 
     <p class="para2 overlap">Elon Reeve Musk FRS (born June 28, 1971) is a South African-Canadian-American businessman
         and
@@ -297,9 +318,16 @@ body {
         Program, supported the engineering and production of the Model S sedan, as well as the development of
         commercial powertrain technology.[32] Tesla repaid the loan in May 2013, with $12 million in interest.</p>
 
-<a href="https://x.com/Tesla">
-    <img src="Tesla_Motors.jpg" alt="" class="teslogo overlap">
-</a>
+    <a href="https://x.com/Tesla">
+        <img src="Tesla_Motors.jpg" alt="" class="teslogo overlap">
+    </a>
+
+    <script>
+        function goPage() {
+            window.location.href = "demo.html";
+        }
+    </script>
+
     <script>
         const img = document.getElementById("elonFloat");
         const elements = document.querySelectorAll(".overlap");
@@ -331,60 +359,60 @@ body {
         window.addEventListener("mousemove", checkOverlap);
     </script>
     <script>
-    const canvas = document.getElementById("space");
-    const ctx = canvas.getContext("2d");
+        const canvas = document.getElementById("space");
+        const ctx = canvas.getContext("2d");
 
-    let w, h;
-    function resize() {
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resize);
-    resize();
+        let w, h;
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resize);
+        resize();
 
-    const stars = [];
-    const STAR_COUNT = 800;
+        const stars = [];
+        const STAR_COUNT = 800;
 
-    for (let i = 0; i < STAR_COUNT; i++) {
-        stars.push({
-            x: Math.random() * w - w / 2,
-            y: Math.random() * h - h / 2,
-            z: Math.random() * w
-        });
-    }
-
-    function animate() {
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, w, h);
-
-        ctx.translate(w / 2, h / 2);
-
-        for (let star of stars) {
-            star.z -= 10;
-
-            if (star.z <= 0) {
-                star.z = w;
-                star.x = Math.random() * w - w / 2;
-                star.y = Math.random() * h - h / 2;
-            }
-
-            const k = 128 / star.z;
-            const px = star.x * k;
-            const py = star.y * k;
-
-            if (px > -w/2 && px < w/2 && py > -h/2 && py < h/2) {
-                const size = (1 - star.z / w) * 3;
-                ctx.fillStyle = "white";
-                ctx.fillRect(px, py, size, size);
-            }
+        for (let i = 0; i < STAR_COUNT; i++) {
+            stars.push({
+                x: Math.random() * w - w / 2,
+                y: Math.random() * h - h / 2,
+                z: Math.random() * w
+            });
         }
 
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        requestAnimationFrame(animate);
-    }
+        function animate() {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, w, h);
 
-    animate();
-</script>
+            ctx.translate(w / 2, h / 2);
+
+            for (let star of stars) {
+                star.z -= 10;
+
+                if (star.z <= 0) {
+                    star.z = w;
+                    star.x = Math.random() * w - w / 2;
+                    star.y = Math.random() * h - h / 2;
+                }
+
+                const k = 128 / star.z;
+                const px = star.x * k;
+                const py = star.y * k;
+
+                if (px > -w / 2 && px < w / 2 && py > -h / 2 && py < h / 2) {
+                    const size = (1 - star.z / w) * 3;
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(px, py, size, size);
+                }
+            }
+
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
 
 </body>
 
